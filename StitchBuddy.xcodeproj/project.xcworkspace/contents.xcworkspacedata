@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:StitchBuddy.xcodeproj">
+      location = "group:../../../../Downloads/GPUImage3-master/framework/GPUImage.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "self:">
    </FileRef>
 </Workspace>
