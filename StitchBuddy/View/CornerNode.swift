@@ -12,7 +12,7 @@ import ARKit
 
 class CornerNode: SCNNode{
     
-    private let height = CGFloat(0.0001)
+    private let height = ARConstants.defaultHeight
     
     // outer translucent cylinder
     private var outerCylinder: SCNNode?
@@ -27,7 +27,7 @@ class CornerNode: SCNNode{
     
     // inner opaque cylinder
     private var innerCylinder: SCNNode?
-    private let innerRadius = CGFloat(0.001)
+    private let innerRadius = ARConstants.lineWidth / 2
     let innerMaterial: SCNMaterial = {
         let material = SCNMaterial()
         material.diffuse.contents = UIColor.systemYellow

@@ -11,7 +11,7 @@ import ARKit
 
 class CornerCursor: SCNNode{
     
-    private let height = CGFloat(0.00005)
+    private let height = ARConstants.defaultHeight / 2
     
     // outer translucent cylinder
     private let outerRadius = CGFloat(0.05)
@@ -23,7 +23,7 @@ class CornerCursor: SCNNode{
     }()
     
     // inner opaque cylinder
-    private let innerRadius = CGFloat(0.001)
+    private let innerRadius = ARConstants.lineWidth / 2
     let innerMaterial: SCNMaterial = {
         let material = SCNMaterial()
         material.lightingModel = .constant
@@ -36,8 +36,8 @@ class CornerCursor: SCNNode{
         _createCursor()
     }
     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
         _createCursor()
     }
     

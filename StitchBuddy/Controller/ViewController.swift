@@ -30,6 +30,8 @@ class ViewController: UIViewController {
     
     // Edge Placement
     private var isPlacingEdges = false
+    private let leftEdge = EdgeNode()
+    private let rightEdge = EdgeNode()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,8 +39,15 @@ class ViewController: UIViewController {
         sceneView.autoenablesDefaultLighting = false
         screenCenter = view.center
         cornerCursor.isHidden = true
+        
         sceneView.scene.rootNode.addChildNode(cornerCursor)
         sceneView.scene.rootNode.addChildNode(cornerNode)
+//        leftEdge.color = ARConstants.leftColor
+//        rightEdge.color = ARConstants.rightColor
+        leftEdge.createHandle()
+        rightEdge.createHandle()
+        sceneView.scene.rootNode.addChildNode(leftEdge)
+        sceneView.scene.rootNode.addChildNode(rightEdge)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -89,6 +98,32 @@ class ViewController: UIViewController {
     @IBAction func donePlacingCornerButtonPressed(_ sender: UIButton) {
         updateIsPlacingCorner(to: false)
         cornerNode.unhighlight()
+        
+        let (leftPosition, rightPosition) = getDefaultHandlePositions(from: cornerNode.worldPosition)
+        leftEdge.isHidden = false
+        rightEdge.isHidden = false
+        
+        leftEdge.update(pivotPoint: cornerNode.position, outerPoint: leftPosition)
+        rightEdge.update(pivotPoint: cornerNode.position, outerPoint: rightPosition)
+    }
+    
+    // returns left handle, right handle
+    func getDefaultHandlePositions(from pivotPoint: SCNVector3) -> (SCNVector3, SCNVector3){
+        let leftPoint = CGPoint(x: view.frame.width * 0.25, y: view.frame.height * 0.25)
+        let rightPoint = CGPoint(x: view.frame.width * 0.75, y: view.frame.height * 0.25)
+        
+        // hit results
+        guard let leftResult = hitPlane(at: leftPoint), let rightResult = hitPlane(at: rightPoint) else { return (SCNVector3(0, pivotPoint.y, 0), SCNVector3(0, pivotPoint.y, 0)) }
+        
+        let leftPosition = SCNVector3(leftResult.worldTransform.columns.3.x,
+                                      leftResult.worldTransform.columns.3.y,
+                                      leftResult.worldTransform.columns.3.z)
+        
+        let rightPosition = SCNVector3(rightResult.worldTransform.columns.3.x,
+                                      rightResult.worldTransform.columns.3.y,
+                                      rightResult.worldTransform.columns.3.z)
+        
+        return (leftPosition, rightPosition)
     }
 }
 
