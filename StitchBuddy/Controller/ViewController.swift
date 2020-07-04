@@ -9,40 +9,58 @@
 import UIKit
 import SceneKit
 import ARKit
-import GPUImage
 
 class ViewController: UIViewController {
     
     @IBOutlet var sceneView: ARSCNView!
+    @IBOutlet weak var cornerPlacementView: UIView!
     
-    // ARSession Config
-    private let session = ARSession()
-    private let sessionConfiguration: ARWorldTrackingConfiguration = {
-        let config = ARWorldTrackingConfiguration()
-        config.planeDetection = .horizontal
-        return config
-    }()
+    private var screenCenter: CGPoint!
     
     private var planeAnchor: ARAnchor?
     
-    // Corner Detection variables
-//    var counter = 0
-//    let ciContext = CIContext.init(options: nil)
-//    var camera: Camera?
+    private let guidanceOverlay = ARCoachingOverlayView()
+    
+    // Corner Placement
+    private var isPlacingCorner = false
+    private let cornerCursor = CornerCursor()
+    private var cornerNode = CornerNode()
+    @IBOutlet weak var placeCornerButton: UIButton!
+    @IBOutlet weak var donePlacingCornerButton: UIButton!
+    
+    // Edge Placement
+    private var isPlacingEdges = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         sceneView.delegate = self
-        sceneView.session = session
-        session.delegate = self
+        sceneView.autoenablesDefaultLighting = false
+        screenCenter = view.center
+        cornerCursor.isHidden = true
+        sceneView.scene.rootNode.addChildNode(cornerCursor)
+        sceneView.scene.rootNode.addChildNode(cornerNode)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
+        // round button corners
+        placeCornerButton.layer.cornerRadius = placeCornerButton.frame.height / 2
+        donePlacingCornerButton.layer.cornerRadius = donePlacingCornerButton.frame.height / 2
+        
         // Make sure that ARKit is supported
         if ARWorldTrackingConfiguration.isSupported {
-            session.run(sessionConfiguration, options: [.removeExistingAnchors, .resetTracking])
+            // ARSession Config
+            let sessionConfiguration: ARWorldTrackingConfiguration = {
+                let config = ARWorldTrackingConfiguration()
+                config.planeDetection = .horizontal
+                return config
+            }()
+            
+            // Add coaching overlay
+            setOverlay(automatically: true, forDetectionType: .horizontalPlane)
+            
+            sceneView.session.run(sessionConfiguration, options: [.removeExistingAnchors, .resetTracking])
         } else {
             print("Sorry, your device doesn't support ARKit")
         }
@@ -53,6 +71,25 @@ class ViewController: UIViewController {
         sceneView.session.pause()
     }
     
+    func updateIsPlacingCorner(to isPlacingCorner: Bool){
+        self.isPlacingCorner = isPlacingCorner
+        cornerPlacementView.isHidden = !isPlacingCorner
+        cornerCursor.isHidden = !isPlacingCorner
+    }
+    
+    @IBAction func placeCornerButtonPressed(_ sender: UIButton) {
+        donePlacingCornerButton.isHidden = false
+        guard let result = hitPlane(at: screenCenter) else { return }
+        cornerNode.position = SCNVector3(result.worldTransform.columns.3.x,
+                                           result.worldTransform.columns.3.y,
+                                           result.worldTransform.columns.3.z)
+        cornerNode.isHidden = false
+    }
+    
+    @IBAction func donePlacingCornerButtonPressed(_ sender: UIButton) {
+        updateIsPlacingCorner(to: false)
+        cornerNode.unhighlight()
+    }
 }
 
 // MARK: - ARSCNViewDelegate
@@ -64,35 +101,56 @@ extension ViewController: ARSCNViewDelegate{
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
         planeAnchor = anchor
     }
+    
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
+        guard let result = hitPlane(at: screenCenter) else { return }
+        cornerCursor.position = SCNVector3(result.worldTransform.columns.3.x,
+                                           result.worldTransform.columns.3.y,
+                                           result.worldTransform.columns.3.z)
+    }
+    
+    private func hitPlane(at position: CGPoint) -> ARHitTestResult?{
+        return sceneView.hitTest(position, types: [.existingPlane]).first
+    }
 }
 
-// Mark: - ARSessionDelegate
-extension ViewController: ARSessionDelegate{
+// MARK: - Coaching Overlay
+extension ViewController: ARCoachingOverlayViewDelegate{
+    func setOverlay(automatically: Bool, forDetectionType goal: ARCoachingOverlayView.Goal){
+      
+      //1. Link The GuidanceOverlay To Our Current Session
+      guidanceOverlay.session = sceneView.session
+      guidanceOverlay.delegate = self
+      sceneView.addSubview(guidanceOverlay)
+      
+      //2. Set It To Fill Our View
+      NSLayoutConstraint.activate([
+        NSLayoutConstraint(item:  guidanceOverlay, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
+        NSLayoutConstraint(item:  guidanceOverlay, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0),
+        NSLayoutConstraint(item:  guidanceOverlay, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
+        NSLayoutConstraint(item:  guidanceOverlay, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0)
+        ])
+      
+      guidanceOverlay.translatesAutoresizingMaskIntoConstraints = false
+      
+      //3. Enable The Overlay To Activate Automatically Based On User Preference
+      guidanceOverlay.activatesAutomatically = automatically
+      
+      //4. Set The Purpose Of The Overlay Based On The User Preference
+      guidanceOverlay.goal = goal
+      
+    }
     
+    func coachingOverlayViewWillActivate(_ coachingOverlayView: ARCoachingOverlayView) {
+        updateIsPlacingCorner(to: false)
+    }
     
-// Corner detection code
-//    func session(_ session: ARSession, didUpdate frame: ARFrame) {
-//        let pixelBuffer = frame.capturedImage
-//        guard let cgImage = ciContext.createCGImage(CIImage(cvPixelBuffer: pixelBuffer), from: CGRect(x:0, y:0, width:CVPixelBufferGetWidth(pixelBuffer),  height:CVPixelBufferGetHeight(pixelBuffer))) else { return }
-//        detectCorners(in: cgImage)
-//    }
+    func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) {
+        updateIsPlacingCorner(to: true)
+    }
     
-//    func detectCorners(in cgImage: CGImage){
-//        counter += 1
-//        if counter != 10 { return }
-//
-//        let uiImage = UIImage(cgImage: cgImage)
-//        let pictureInput = PictureInput(image: uiImage)
-//        pictureInput.removeAllTargets()
-//
-//        // Harris Corner Detection Filter
-//        let filter = HarrisCornerDetector()
-//        filter.cornersDetectedCallback = { (positions) -> Void in
-//            print("positions: \(positions)")
-//        }
-//
-//        pictureInput.addTarget(filter)
-//        pictureInput.processImage(synchronously: true)
-//        counter = 0
-//    }
+    func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) {
+        updateIsPlacingCorner(to: false)
+    }
+
 }
