@@ -16,4 +16,9 @@ class ARConstants {
     static let actionColor = UIColor.systemYellow
     static let leftColor = UIColor.systemBlue;
     static let rightColor = UIColor.systemPurple;
+    
+    enum Interactive: Int {
+        case no = 1
+        case yes = 2
+    }
 }

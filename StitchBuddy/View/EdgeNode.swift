@@ -24,11 +24,7 @@ class EdgeNode: SCNNode{
     }
     
     func createHandle(){
-        let sphere = SCNSphere(radius: CGFloat(0.01))
-        let material = SCNMaterial()
-        material.diffuse.contents = ARConstants.actionColor
-        sphere.materials = [material]
-        handleNode = SCNNode(geometry: sphere)
+        handleNode = EdgeHandleNode()
         addChildNode(handleNode!)
     }
     
@@ -54,7 +50,19 @@ class EdgeNode: SCNNode{
         
         // move handle if necessary
         if handleNode != nil{
+            handleNode?.isHidden = false
             handleNode?.worldPosition = outerPoint
+        }
+    }
+    
+    // recursive function to get first edge node from node or node's parents
+    static func getFirstEdgeNode(from node: SCNNode) -> EdgeNode?{
+        if let edgenode = node as? EdgeNode{
+            return edgenode
+        } else if let parent = node.parent{
+            return getFirstEdgeNode(from: parent)
+        } else {
+            return nil
         }
     }
 }

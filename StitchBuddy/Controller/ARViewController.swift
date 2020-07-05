@@ -19,7 +19,7 @@ class ARViewController: UIViewController {
     
     private var planeAnchor: ARAnchor?
     
-    private let guidanceOverlay = ARCoachingOverlayView()
+    let guidanceOverlay = ARCoachingOverlayView()
     
     // Corner Placement
     private var isPlacingCorner = false
@@ -35,19 +35,27 @@ class ARViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        screenCenter = view.center
+        
+        // setup sceneview
         sceneView.delegate = self
         sceneView.autoenablesDefaultLighting = false
-        screenCenter = view.center
+        
+        // setup corner node
         cornerCursor.isHidden = true
         
+        // setup edge and handle nodes
         sceneView.scene.rootNode.addChildNode(cornerCursor)
         sceneView.scene.rootNode.addChildNode(cornerNode)
-//        leftEdge.color = ARConstants.leftColor
-//        rightEdge.color = ARConstants.rightColor
         leftEdge.createHandle()
         rightEdge.createHandle()
         sceneView.scene.rootNode.addChildNode(leftEdge)
         sceneView.scene.rootNode.addChildNode(rightEdge)
+        
+        // setup gestures
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(viewPanned))
+        sceneView.addGestureRecognizer(panGesture)
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -67,7 +75,7 @@ class ARViewController: UIViewController {
             }()
             
             // Add coaching overlay
-            setOverlay(automatically: true, forDetectionType: .horizontalPlane)
+            self.setOverlay(automatically: true, forDetectionType: .horizontalPlane)
             
             sceneView.session.run(sessionConfiguration, options: [.removeExistingAnchors, .resetTracking])
         } else {
@@ -90,40 +98,63 @@ class ARViewController: UIViewController {
         donePlacingCornerButton.isHidden = false
         guard let result = hitPlane(at: screenCenter) else { return }
         cornerNode.position = SCNVector3(result.worldTransform.columns.3.x,
-                                           result.worldTransform.columns.3.y,
-                                           result.worldTransform.columns.3.z)
+                                         result.worldTransform.columns.3.y,
+                                         result.worldTransform.columns.3.z)
         cornerNode.isHidden = false
     }
     
     @IBAction func donePlacingCornerButtonPressed(_ sender: UIButton) {
+        isPlacingEdges = true
+        
         updateIsPlacingCorner(to: false)
         cornerNode.unhighlight()
         
         let (leftPosition, rightPosition) = getDefaultHandlePositions(from: cornerNode.worldPosition)
         leftEdge.isHidden = false
         rightEdge.isHidden = false
+        leftEdge.handleNode?.isHidden = false
+        rightEdge.handleNode?.isHidden = false
         
         leftEdge.update(pivotPoint: cornerNode.position, outerPoint: leftPosition)
         rightEdge.update(pivotPoint: cornerNode.position, outerPoint: rightPosition)
     }
     
+    // returns starting positions for left handle, right handle
+    func initialHandlePositions() -> (CGPoint, CGPoint){
+        return (CGPoint(x: view.frame.width * 0.25, y: view.frame.height * 0.25), CGPoint(x: view.frame.width * 0.75, y: view.frame.height * 0.25))
+    }
+    
     // returns left handle, right handle
     func getDefaultHandlePositions(from pivotPoint: SCNVector3) -> (SCNVector3, SCNVector3){
-        let leftPoint = CGPoint(x: view.frame.width * 0.25, y: view.frame.height * 0.25)
-        let rightPoint = CGPoint(x: view.frame.width * 0.75, y: view.frame.height * 0.25)
+        let (leftPoint, rightPoint) = initialHandlePositions()
         
         // hit results
         guard let leftResult = hitPlane(at: leftPoint), let rightResult = hitPlane(at: rightPoint) else { return (SCNVector3(0, pivotPoint.y, 0), SCNVector3(0, pivotPoint.y, 0)) }
         
         let leftPosition = SCNVector3(leftResult.worldTransform.columns.3.x,
-                                      leftResult.worldTransform.columns.3.y,
+                                      pivotPoint.y,
                                       leftResult.worldTransform.columns.3.z)
         
         let rightPosition = SCNVector3(rightResult.worldTransform.columns.3.x,
-                                      rightResult.worldTransform.columns.3.y,
-                                      rightResult.worldTransform.columns.3.z)
+                                       pivotPoint.y,
+                                       rightResult.worldTransform.columns.3.z)
         
         return (leftPosition, rightPosition)
+    }
+    
+    @objc private func viewPanned(_ gesture: UIPanGestureRecognizer) {
+        if planeAnchor == nil { return }
+        
+        let hitLocation = gesture.location(in: sceneView)
+        if let node = node(at: hitLocation), node.categoryBitMask == ARConstants.Interactive.yes.rawValue{
+            if let edgeNode = EdgeNode.getFirstEdgeNode(from: node){
+                guard let hitResult = hitPlane(at: gesture.location(in: sceneView)) else { return }
+                let outerPoint = SCNVector3(hitResult.worldTransform.columns.3.x,
+                                            cornerNode.worldPosition.y,
+                                            hitResult.worldTransform.columns.3.z)
+                edgeNode.update(pivotPoint: cornerNode.worldPosition, outerPoint: outerPoint)
+            }
+        }
     }
 }
 
@@ -138,54 +169,25 @@ extension ARViewController: ARSCNViewDelegate{
     }
     
     func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval) {
-        guard let result = hitPlane(at: screenCenter) else { return }
-        cornerCursor.position = SCNVector3(result.worldTransform.columns.3.x,
-                                           result.worldTransform.columns.3.y,
-                                           result.worldTransform.columns.3.z)
+        if isPlacingCorner{
+            guard let result = hitPlane(at: screenCenter) else { return }
+            cornerCursor.position = SCNVector3(result.worldTransform.columns.3.x,
+                                               result.worldTransform.columns.3.y,
+                                               result.worldTransform.columns.3.z)
+        } else if isPlacingEdges{
+            // left side
+            
+        }
     }
     
     private func hitPlane(at position: CGPoint) -> ARHitTestResult?{
         return sceneView.hitTest(position, types: [.existingPlane]).first
     }
-}
-
-// MARK: - Coaching Overlay
-extension ARViewController: ARCoachingOverlayViewDelegate{
-    func setOverlay(automatically: Bool, forDetectionType goal: ARCoachingOverlayView.Goal){
-      
-      //1. Link The GuidanceOverlay To Our Current Session
-      guidanceOverlay.session = sceneView.session
-      guidanceOverlay.delegate = self
-      sceneView.addSubview(guidanceOverlay)
-      
-      //2. Set It To Fill Our View
-      NSLayoutConstraint.activate([
-        NSLayoutConstraint(item:  guidanceOverlay, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
-        NSLayoutConstraint(item:  guidanceOverlay, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0),
-        NSLayoutConstraint(item:  guidanceOverlay, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0),
-        NSLayoutConstraint(item:  guidanceOverlay, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0)
-        ])
-      
-      guidanceOverlay.translatesAutoresizingMaskIntoConstraints = false
-      
-      //3. Enable The Overlay To Activate Automatically Based On User Preference
-      guidanceOverlay.activatesAutomatically = automatically
-      
-      //4. Set The Purpose Of The Overlay Based On The User Preference
-      guidanceOverlay.goal = goal
-      
-    }
     
-    func coachingOverlayViewWillActivate(_ coachingOverlayView: ARCoachingOverlayView) {
-        updateIsPlacingCorner(to: false)
+    private func node(at position: CGPoint) -> SCNNode? {
+        if let firstNode = sceneView.hitTest(position, options: nil).first?.node{
+            return firstNode
+        }
+        return nil
     }
-    
-    func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) {
-        updateIsPlacingCorner(to: true)
-    }
-    
-    func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) {
-        updateIsPlacingCorner(to: false)
-    }
-
 }

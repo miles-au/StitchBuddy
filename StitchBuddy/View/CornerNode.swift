@@ -19,7 +19,7 @@ class CornerNode: SCNNode{
     private let outerRadius = CGFloat(0.05)
     let outerMaterial: SCNMaterial = {
         let material = SCNMaterial()
-        material.diffuse.contents = UIColor.systemYellow
+        material.diffuse.contents = ARConstants.actionColor
         material.lightingModel = .constant
         material.transparency = 0.3
         return material
@@ -30,7 +30,7 @@ class CornerNode: SCNNode{
     private let innerRadius = ARConstants.lineWidth / 2
     let innerMaterial: SCNMaterial = {
         let material = SCNMaterial()
-        material.diffuse.contents = UIColor.systemYellow
+        material.diffuse.contents = ARConstants.actionColor
         material.lightingModel = .constant
         material.transparency = 1
         return material
