@@ -42,6 +42,7 @@ extension ARViewController: ARCoachingOverlayViewDelegate{
     
     func coachingOverlayViewDidDeactivate(_ coachingOverlayView: ARCoachingOverlayView) {
         updateIsPlacingCorner(to: true)
+        actionsView.isHidden = false
     }
     
     func coachingOverlayViewDidRequestSessionReset(_ coachingOverlayView: ARCoachingOverlayView) {

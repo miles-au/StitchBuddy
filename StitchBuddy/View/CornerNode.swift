@@ -66,13 +66,13 @@ class CornerNode: SCNNode{
         addChildNode(innerCylinder!)
     }
     
-    func highlight(){
-        outerCylinder?.isHidden = false
-        innerCylinder?.geometry?.materials.first?.diffuse.contents = UIColor.systemYellow
-    }
-    
-    func unhighlight(){
-        outerCylinder?.isHidden = true
-        innerCylinder?.geometry?.materials.first?.diffuse.contents = UIColor.white
+    func setHighlight(to highlight: Bool){
+        if highlight{
+            outerCylinder?.isHidden = false
+            innerCylinder?.geometry?.materials.first?.diffuse.contents = UIColor.systemYellow
+        }else{
+            outerCylinder?.isHidden = true
+            innerCylinder?.geometry?.materials.first?.diffuse.contents = UIColor.white
+        }
     }
 }

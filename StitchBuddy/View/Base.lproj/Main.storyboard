@@ -18,59 +18,53 @@
                             <arscnView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BrB-h1-WRS">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                             </arscnView>
-                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Zlr-uX-GkP">
-                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="T7o-oO-sJO">
+                                <rect key="frame" x="0.0" y="756.5" width="414" height="105.5"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rnm-HU-iVa">
-                                        <rect key="frame" x="114.5" y="626" width="185" height="42"/>
-                                        <color key="backgroundColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <inset key="contentEdgeInsets" minX="30" minY="10" maxX="30" maxY="10"/>
-                                        <inset key="imageEdgeInsets" minX="-10" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                        <state key="normal" title="Place Corner" image="smallcircle.fill.circle" catalog="system"/>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HVQ-dk-YAv">
+                                        <rect key="frame" x="183.5" y="40.5" width="47" height="45"/>
+                                        <color key="tintColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <state key="normal" image="checkmark.circle" catalog="system">
+                                            <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="40"/>
+                                        </state>
                                         <connections>
-                                            <action selector="placeCornerButtonPressed:" destination="BV1-FR-VrT" eventType="touchUpInside" id="HDh-91-nyY"/>
+                                            <action selector="doneButtonPressed:" destination="BV1-FR-VrT" eventType="touchUpInside" id="wx5-1s-lX6"/>
                                         </connections>
                                     </button>
-                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PGo-NY-xWg">
-                                        <rect key="frame" x="114.5" y="683" width="185" height="42"/>
-                                        <color key="backgroundColor" systemColor="systemYellowColor" red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <inset key="contentEdgeInsets" minX="0.0" minY="10" maxX="0.0" maxY="10"/>
-                                        <inset key="imageEdgeInsets" minX="-10" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                        <state key="normal" title="Done" image="checkmark" catalog="system"/>
-                                        <connections>
-                                            <action selector="donePlacingCornerButtonPressed:" destination="BV1-FR-VrT" eventType="touchUpInside" id="VLc-qi-RpJ"/>
-                                        </connections>
-                                    </button>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Instructions" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dM7-2e-4Qp">
+                                        <rect key="frame" x="15" y="10" width="384" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="rnm-HU-iVa" secondAttribute="bottom" constant="150" id="5f3-uB-Uzl"/>
-                                    <constraint firstItem="PGo-NY-xWg" firstAttribute="width" secondItem="rnm-HU-iVa" secondAttribute="width" id="7D0-vH-adn"/>
-                                    <constraint firstItem="PGo-NY-xWg" firstAttribute="top" secondItem="rnm-HU-iVa" secondAttribute="bottom" constant="15" id="CbZ-YC-Obd"/>
-                                    <constraint firstItem="PGo-NY-xWg" firstAttribute="centerX" secondItem="Zlr-uX-GkP" secondAttribute="centerX" id="jr9-Fx-tdp"/>
-                                    <constraint firstItem="rnm-HU-iVa" firstAttribute="centerX" secondItem="Zlr-uX-GkP" secondAttribute="centerX" id="seK-Im-6ye"/>
+                                    <constraint firstItem="dM7-2e-4Qp" firstAttribute="leading" secondItem="T7o-oO-sJO" secondAttribute="leading" constant="15" id="2x5-Nc-QLC"/>
+                                    <constraint firstItem="HVQ-dk-YAv" firstAttribute="centerX" secondItem="T7o-oO-sJO" secondAttribute="centerX" id="Az5-sX-uCl"/>
+                                    <constraint firstItem="dM7-2e-4Qp" firstAttribute="top" secondItem="T7o-oO-sJO" secondAttribute="top" constant="10" id="ES9-eF-YBp"/>
+                                    <constraint firstItem="HVQ-dk-YAv" firstAttribute="top" secondItem="dM7-2e-4Qp" secondAttribute="bottom" constant="10" id="Mzh-jQ-Aaq"/>
+                                    <constraint firstAttribute="bottom" secondItem="HVQ-dk-YAv" secondAttribute="bottom" constant="20" id="gJF-sH-yOc"/>
+                                    <constraint firstAttribute="trailing" secondItem="dM7-2e-4Qp" secondAttribute="trailing" constant="15" id="v8o-fd-PBg"/>
                                 </constraints>
                             </view>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="Zlr-uX-GkP" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="GnI-1a-BJO"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="GsS-dJ-CKf"/>
+                            <constraint firstItem="T7o-oO-sJO" firstAttribute="centerX" secondItem="fQZ-KI-GVf" secondAttribute="centerX" id="UhG-60-hwx"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="bottom" secondItem="U0K-SW-4ec" secondAttribute="bottom" id="VpT-BR-CcM"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="trailing" secondItem="fQZ-KI-GVf" secondAttribute="trailing" id="XyZ-9z-H8e"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="top" secondItem="U0K-SW-4ec" secondAttribute="top" id="rJc-2c-zQA"/>
-                            <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="Zlr-uX-GkP" secondAttribute="bottom" id="rOp-Qt-w57"/>
-                            <constraint firstItem="fQZ-KI-GVf" firstAttribute="trailing" secondItem="Zlr-uX-GkP" secondAttribute="trailing" id="sIe-nX-p3j"/>
-                            <constraint firstItem="Zlr-uX-GkP" firstAttribute="top" secondItem="fQZ-KI-GVf" secondAttribute="top" id="vg1-JI-tfu"/>
+                            <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="T7o-oO-sJO" secondAttribute="bottom" id="w4D-WM-dEp"/>
+                            <constraint firstItem="T7o-oO-sJO" firstAttribute="width" secondItem="fQZ-KI-GVf" secondAttribute="width" id="zZk-2w-Ms7"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="fQZ-KI-GVf"/>
                     </view>
                     <connections>
-                        <outlet property="cornerPlacementView" destination="Zlr-uX-GkP" id="4W4-kH-zOw"/>
-                        <outlet property="donePlacingCornerButton" destination="PGo-NY-xWg" id="t2G-wV-gHi"/>
-                        <outlet property="placeCornerButton" destination="rnm-HU-iVa" id="OMh-br-NWu"/>
+                        <outlet property="actionsView" destination="T7o-oO-sJO" id="OA6-J6-aSO"/>
+                        <outlet property="doneButton" destination="HVQ-dk-YAv" id="ewb-iD-fs3"/>
+                        <outlet property="instructionsLabel" destination="dM7-2e-4Qp" id="gdT-WE-DJh"/>
                         <outlet property="sceneView" destination="BrB-h1-WRS" id="5nT-qQ-ynl"/>
                     </connections>
                 </viewController>
@@ -80,7 +74,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="checkmark" catalog="system" width="128" height="114"/>
-        <image name="smallcircle.fill.circle" catalog="system" width="128" height="121"/>
+        <image name="checkmark.circle" catalog="system" width="128" height="121"/>
     </resources>
 </document>

@@ -13,7 +13,6 @@ import ARKit
 class ARViewController: UIViewController {
     
     @IBOutlet var sceneView: ARSCNView!
-    @IBOutlet weak var cornerPlacementView: UIView!
     
     private var screenCenter: CGPoint!
     
@@ -21,12 +20,14 @@ class ARViewController: UIViewController {
     
     let guidanceOverlay = ARCoachingOverlayView()
     
+    @IBOutlet weak var actionsView: UIView!
+    @IBOutlet weak var instructionsLabel: UILabel!
+    @IBOutlet weak var doneButton: UIButton!
+    
     // Corner Placement
     private var isPlacingCorner = false
     private let cornerCursor = CornerCursor()
     private var cornerNode = CornerNode()
-    @IBOutlet weak var placeCornerButton: UIButton!
-    @IBOutlet weak var donePlacingCornerButton: UIButton!
     
     // Edge Placement
     private var isPlacingEdges = false
@@ -56,14 +57,13 @@ class ARViewController: UIViewController {
         // setup gestures
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(viewPanned))
         sceneView.addGestureRecognizer(panGesture)
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewTapped))
+        sceneView.addGestureRecognizer(tapGesture)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        // round button corners
-        placeCornerButton.layer.cornerRadius = placeCornerButton.frame.height / 2
-        donePlacingCornerButton.layer.cornerRadius = donePlacingCornerButton.frame.height / 2
         
         // Make sure that ARKit is supported
         if ARWorldTrackingConfiguration.isSupported {
@@ -90,33 +90,18 @@ class ARViewController: UIViewController {
     
     func updateIsPlacingCorner(to isPlacingCorner: Bool){
         self.isPlacingCorner = isPlacingCorner
-        cornerPlacementView.isHidden = !isPlacingCorner
+        instructionsLabel.text = "Tap the screen to mark the corner of the fabric."
         cornerCursor.isHidden = !isPlacingCorner
+        cornerNode.setHighlight(to: isPlacingCorner)
     }
     
-    @IBAction func placeCornerButtonPressed(_ sender: UIButton) {
-        donePlacingCornerButton.isHidden = false
-        guard let result = hitPlane(at: screenCenter) else { return }
-        cornerNode.position = SCNVector3(result.worldTransform.columns.3.x,
-                                         result.worldTransform.columns.3.y,
-                                         result.worldTransform.columns.3.z)
-        cornerNode.isHidden = false
-    }
-    
-    @IBAction func donePlacingCornerButtonPressed(_ sender: UIButton) {
-        isPlacingEdges = true
-        
-        updateIsPlacingCorner(to: false)
-        cornerNode.unhighlight()
-        
-        let (leftPosition, rightPosition) = getDefaultHandlePositions(from: cornerNode.worldPosition)
+    func updateIsPlacingEdges(to isPlacingEdges: Bool){
+        self.isPlacingEdges = isPlacingEdges
         leftEdge.isHidden = false
         rightEdge.isHidden = false
         leftEdge.handleNode?.isHidden = false
         rightEdge.handleNode?.isHidden = false
-        
-        leftEdge.update(pivotPoint: cornerNode.position, outerPoint: leftPosition)
-        rightEdge.update(pivotPoint: cornerNode.position, outerPoint: rightPosition)
+        instructionsLabel.text = "Drag the handles to the edges of the fabric"
     }
     
     // returns starting positions for left handle, right handle
@@ -154,6 +139,31 @@ class ARViewController: UIViewController {
                                             hitResult.worldTransform.columns.3.z)
                 edgeNode.update(pivotPoint: cornerNode.worldPosition, outerPoint: outerPoint)
             }
+        }
+    }
+    
+    @objc private func viewTapped(_ recognizer: UITapGestureRecognizer) {
+        print("tap")
+        print("is placing corner: \(isPlacingCorner)")
+        if(isPlacingCorner){
+            doneButton.isHidden = false
+            guard let result = hitPlane(at: screenCenter) else { return }
+            cornerNode.position = SCNVector3(result.worldTransform.columns.3.x,
+                                             result.worldTransform.columns.3.y,
+                                             result.worldTransform.columns.3.z)
+            cornerNode.isHidden = false
+        }
+    }
+    
+    @IBAction func doneButtonPressed(_ sender: UIButton) {
+        if (isPlacingCorner){
+            updateIsPlacingCorner(to: false)
+            updateIsPlacingEdges(to: true)
+            
+            let (leftPosition, rightPosition) = getDefaultHandlePositions(from: cornerNode.worldPosition)
+            
+            leftEdge.update(pivotPoint: cornerNode.position, outerPoint: leftPosition)
+            rightEdge.update(pivotPoint: cornerNode.position, outerPoint: rightPosition)
         }
     }
 }
