@@ -52,9 +52,20 @@
                                 <rect key="frame" x="0.0" y="540.5" width="414" height="216"/>
                                 <color key="backgroundColor" white="1" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </pickerView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="u2I-3D-G66">
+                                <rect key="frame" x="358" y="59" width="41" height="40"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" image="arrow.counterclockwise.circle" catalog="system">
+                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="35"/>
+                                </state>
+                                <connections>
+                                    <action selector="resetButtonPressed:" destination="BV1-FR-VrT" eventType="touchUpInside" id="2Yf-j2-bmA"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="u2I-3D-G66" firstAttribute="top" secondItem="fQZ-KI-GVf" secondAttribute="top" constant="15" id="4Rz-KW-uEP"/>
                             <constraint firstItem="T7o-oO-sJO" firstAttribute="top" secondItem="jbp-VQ-aP0" secondAttribute="bottom" id="Fsb-3E-eBw"/>
                             <constraint firstItem="jbp-VQ-aP0" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="GnL-np-tmk"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="GsS-dJ-CKf"/>
@@ -63,6 +74,7 @@
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="trailing" secondItem="fQZ-KI-GVf" secondAttribute="trailing" id="XyZ-9z-H8e"/>
                             <constraint firstItem="jbp-VQ-aP0" firstAttribute="trailing" secondItem="fQZ-KI-GVf" secondAttribute="trailing" id="eYW-Js-UH7"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="top" secondItem="U0K-SW-4ec" secondAttribute="top" id="rJc-2c-zQA"/>
+                            <constraint firstItem="fQZ-KI-GVf" firstAttribute="trailing" secondItem="u2I-3D-G66" secondAttribute="trailing" constant="15" id="vNo-SC-BbN"/>
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="T7o-oO-sJO" secondAttribute="bottom" id="w4D-WM-dEp"/>
                             <constraint firstItem="T7o-oO-sJO" firstAttribute="width" secondItem="fQZ-KI-GVf" secondAttribute="width" id="zZk-2w-Ms7"/>
                         </constraints>
@@ -82,6 +94,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="arrow.counterclockwise.circle" catalog="system" width="128" height="121"/>
         <image name="checkmark.circle" catalog="system" width="128" height="121"/>
     </resources>
 </document>

@@ -18,6 +18,7 @@
 		07118F7224A9601B008EAF8E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 07118F7124A9601B008EAF8E /* Assets.xcassets */; };
 		07118F7524A9601B008EAF8E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 07118F7324A9601B008EAF8E /* LaunchScreen.storyboard */; };
 		0772AD3624B17990003F6B7E /* EdgeHandleNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0772AD3524B17990003F6B7E /* EdgeHandleNode.swift */; };
+		07D9B18724B323E30077BE95 /* ARViewController+PickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07D9B18624B323E30077BE95 /* ARViewController+PickerView.swift */; };
 		07DAA72E24B0142300B1ED7D /* SCNVector3Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07DAA72D24B0142300B1ED7D /* SCNVector3Extension.swift */; };
 		07E583E424B08D870061DF5A /* ARViewController+CoachingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E583E324B08D870061DF5A /* ARViewController+CoachingOverlay.swift */; };
 /* End PBXBuildFile section */
@@ -48,6 +49,7 @@
 		07118F7424A9601B008EAF8E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		07118F7624A9601B008EAF8E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0772AD3524B17990003F6B7E /* EdgeHandleNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeHandleNode.swift; sourceTree = "<group>"; };
+		07D9B18624B323E30077BE95 /* ARViewController+PickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARViewController+PickerView.swift"; sourceTree = "<group>"; };
 		07DAA72D24B0142300B1ED7D /* SCNVector3Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SCNVector3Extension.swift; sourceTree = "<group>"; };
 		07E583E324B08D870061DF5A /* ARViewController+CoachingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ARViewController+CoachingOverlay.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -121,6 +123,7 @@
 			children = (
 				07118F6C24A9601A008EAF8E /* ARViewController.swift */,
 				07E583E324B08D870061DF5A /* ARViewController+CoachingOverlay.swift */,
+				07D9B18624B323E30077BE95 /* ARViewController+PickerView.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -215,6 +218,7 @@
 			files = (
 				0706880E24B00FC9007E8F33 /* EdgeNode.swift in Sources */,
 				0706880C24B00B31007E8F33 /* Constants.swift in Sources */,
+				07D9B18724B323E30077BE95 /* ARViewController+PickerView.swift in Sources */,
 				0772AD3624B17990003F6B7E /* EdgeHandleNode.swift in Sources */,
 				07DAA72E24B0142300B1ED7D /* SCNVector3Extension.swift in Sources */,
 				07118F6D24A9601A008EAF8E /* ARViewController.swift in Sources */,
