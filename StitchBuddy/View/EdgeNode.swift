@@ -65,4 +65,11 @@ class EdgeNode: SCNNode{
             return nil
         }
     }
+    
+    func updateColor(to color: UIColor){
+        let material = SCNMaterial()
+        material.diffuse.contents = color
+        geometry?.materials = [material]
+    }
+    
 }

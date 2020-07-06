@@ -34,11 +34,11 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Instructions" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dM7-2e-4Qp">
                                         <rect key="frame" x="15" y="10" width="384" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <nil key="textColor"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.20000000000000001" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="dM7-2e-4Qp" firstAttribute="leading" secondItem="T7o-oO-sJO" secondAttribute="leading" constant="15" id="2x5-Nc-QLC"/>
                                     <constraint firstItem="HVQ-dk-YAv" firstAttribute="centerX" secondItem="T7o-oO-sJO" secondAttribute="centerX" id="Az5-sX-uCl"/>
@@ -48,13 +48,19 @@
                                     <constraint firstAttribute="trailing" secondItem="dM7-2e-4Qp" secondAttribute="trailing" constant="15" id="v8o-fd-PBg"/>
                                 </constraints>
                             </view>
+                            <pickerView hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jbp-VQ-aP0">
+                                <rect key="frame" x="0.0" y="541" width="414" height="216"/>
+                            </pickerView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="T7o-oO-sJO" firstAttribute="top" secondItem="jbp-VQ-aP0" secondAttribute="bottom" id="Fsb-3E-eBw"/>
+                            <constraint firstItem="jbp-VQ-aP0" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="GnL-np-tmk"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="leading" secondItem="fQZ-KI-GVf" secondAttribute="leading" id="GsS-dJ-CKf"/>
                             <constraint firstItem="T7o-oO-sJO" firstAttribute="centerX" secondItem="fQZ-KI-GVf" secondAttribute="centerX" id="UhG-60-hwx"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="bottom" secondItem="U0K-SW-4ec" secondAttribute="bottom" id="VpT-BR-CcM"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="trailing" secondItem="fQZ-KI-GVf" secondAttribute="trailing" id="XyZ-9z-H8e"/>
+                            <constraint firstItem="jbp-VQ-aP0" firstAttribute="trailing" secondItem="fQZ-KI-GVf" secondAttribute="trailing" id="eYW-Js-UH7"/>
                             <constraint firstItem="BrB-h1-WRS" firstAttribute="top" secondItem="U0K-SW-4ec" secondAttribute="top" id="rJc-2c-zQA"/>
                             <constraint firstItem="fQZ-KI-GVf" firstAttribute="bottom" secondItem="T7o-oO-sJO" secondAttribute="bottom" id="w4D-WM-dEp"/>
                             <constraint firstItem="T7o-oO-sJO" firstAttribute="width" secondItem="fQZ-KI-GVf" secondAttribute="width" id="zZk-2w-Ms7"/>
@@ -64,6 +70,7 @@
                     <connections>
                         <outlet property="actionsView" destination="T7o-oO-sJO" id="OA6-J6-aSO"/>
                         <outlet property="doneButton" destination="HVQ-dk-YAv" id="ewb-iD-fs3"/>
+                        <outlet property="insetPicker" destination="jbp-VQ-aP0" id="cuy-DN-rPV"/>
                         <outlet property="instructionsLabel" destination="dM7-2e-4Qp" id="gdT-WE-DJh"/>
                         <outlet property="sceneView" destination="BrB-h1-WRS" id="5nT-qQ-ynl"/>
                     </connections>

@@ -20,4 +20,8 @@ extension SCNVector3{
         
         return sqrtf( pow((x2 - x1), 2) + pow((y2 - y1), 2) + pow((z2 - z1), 2) )
     }
+    
+    static func from(point a: SCNVector3, toPoint b: SCNVector3) -> SCNVector3{
+        return SCNVector3(b.x - a.x , b.y - a.y, b.z - a.z)
+    }
 }

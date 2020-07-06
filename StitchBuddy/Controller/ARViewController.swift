@@ -34,6 +34,19 @@ class ARViewController: UIViewController {
     private let leftEdge = EdgeNode()
     private let rightEdge = EdgeNode()
     
+    // Inset Placement
+    private var isPlacingInsets = false
+    private let leftInset = EdgeNode()
+    private let rightInset = EdgeNode()
+    @IBOutlet weak var insetPicker: UIPickerView!
+    let pickerChoices: [Double] = {
+        var array = [Double]()
+        for i in stride(from: 0.5, through: 10.0, by: 0.5) {
+            array.append(i)
+        }
+        return array
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -53,6 +66,13 @@ class ARViewController: UIViewController {
         rightEdge.createHandle()
         sceneView.scene.rootNode.addChildNode(leftEdge)
         sceneView.scene.rootNode.addChildNode(rightEdge)
+        
+        // setup insets
+        insetPicker.delegate = self
+        insetPicker.dataSource = self
+        sceneView.scene.rootNode.addChildNode(leftInset)
+        sceneView.scene.rootNode.addChildNode(rightInset)
+        
         
         // setup gestures
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(viewPanned))
@@ -97,11 +117,18 @@ class ARViewController: UIViewController {
     
     func updateIsPlacingEdges(to isPlacingEdges: Bool){
         self.isPlacingEdges = isPlacingEdges
-        leftEdge.isHidden = false
-        rightEdge.isHidden = false
-        leftEdge.handleNode?.isHidden = false
-        rightEdge.handleNode?.isHidden = false
+        leftEdge.isHidden = !isPlacingEdges
+        rightEdge.isHidden = !isPlacingEdges
+        leftEdge.handleNode?.isHidden = !isPlacingEdges
+        rightEdge.handleNode?.isHidden = !isPlacingEdges
         instructionsLabel.text = "Drag the handles to the edges of the fabric"
+    }
+    
+    func resetEdgesToDefault(){
+        let (leftPosition, rightPosition) = getDefaultHandlePositions(from: cornerNode.worldPosition)
+        
+        leftEdge.update(pivotPoint: cornerNode.position, outerPoint: leftPosition)
+        rightEdge.update(pivotPoint: cornerNode.position, outerPoint: rightPosition)
     }
     
     // returns starting positions for left handle, right handle
@@ -127,6 +154,16 @@ class ARViewController: UIViewController {
         return (leftPosition, rightPosition)
     }
     
+    func updateIsPlacingInsets(to isPlacingInsets: Bool){
+        self.isPlacingInsets = isPlacingInsets
+        instructionsLabel.text = ""
+        
+        leftEdge.isHidden = !isPlacingInsets
+        rightEdge.isHidden = !isPlacingInsets
+        
+        insetPicker.isHidden = !isPlacingInsets
+    }
+    
     @objc private func viewPanned(_ gesture: UIPanGestureRecognizer) {
         if planeAnchor == nil { return }
         
@@ -143,8 +180,6 @@ class ARViewController: UIViewController {
     }
     
     @objc private func viewTapped(_ recognizer: UITapGestureRecognizer) {
-        print("tap")
-        print("is placing corner: \(isPlacingCorner)")
         if(isPlacingCorner){
             doneButton.isHidden = false
             guard let result = hitPlane(at: screenCenter) else { return }
@@ -159,11 +194,11 @@ class ARViewController: UIViewController {
         if (isPlacingCorner){
             updateIsPlacingCorner(to: false)
             updateIsPlacingEdges(to: true)
-            
-            let (leftPosition, rightPosition) = getDefaultHandlePositions(from: cornerNode.worldPosition)
-            
-            leftEdge.update(pivotPoint: cornerNode.position, outerPoint: leftPosition)
-            rightEdge.update(pivotPoint: cornerNode.position, outerPoint: rightPosition)
+            resetEdgesToDefault()
+        } else if(isPlacingEdges){
+            updateIsPlacingEdges(to: false)
+            updateIsPlacingInsets(to: true)
+            doneButton.isHidden = true
         }
     }
 }
@@ -184,9 +219,6 @@ extension ARViewController: ARSCNViewDelegate{
             cornerCursor.position = SCNVector3(result.worldTransform.columns.3.x,
                                                result.worldTransform.columns.3.y,
                                                result.worldTransform.columns.3.z)
-        } else if isPlacingEdges{
-            // left side
-            
         }
     }
     
@@ -199,5 +231,69 @@ extension ARViewController: ARSCNViewDelegate{
             return firstNode
         }
         return nil
+    }
+}
+
+// MARK: - PickerView
+extension ARViewController: UIPickerViewDataSource{
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 2
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return pickerChoices.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        let title: String = String(format:"%.1f", pickerChoices[row])
+        return title
+    }
+}
+
+extension ARViewController: UIPickerViewDelegate{
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        // get offsets in meters
+        let leftOffset = pickerChoices[insetPicker.selectedRow(inComponent: 0)] / 100
+        let rightOffset = pickerChoices[insetPicker.selectedRow(inComponent: 1)] / 100
+        
+        let cornerPoint = cornerNode.worldPosition
+        
+        // get handle positions
+        guard let leftHandlePosition = leftEdge.handleNode?.worldPosition else { return }
+        guard let rightHandlePosition = rightEdge.handleNode?.worldPosition else { return }
+        
+        // get offset vectors
+        var leftOffsetVector = SCNVector3.from(point: cornerPoint, toPoint: rightHandlePosition) // move the point away from the left vector
+        var rightOffsetVector = SCNVector3.from(point: cornerPoint, toPoint: leftHandlePosition) // move the point away from the right vector
+        
+        // scale the vector
+        leftOffsetVector.x = (leftOffsetVector.x / cornerPoint.distance(to: rightHandlePosition)) * Float(leftOffset)
+        leftOffsetVector.z = (leftOffsetVector.z / cornerPoint.distance(to: rightHandlePosition)) * Float(leftOffset)
+        
+        rightOffsetVector.x = (rightOffsetVector.x / cornerPoint.distance(to: leftHandlePosition)) * Float(rightOffset)
+        rightOffsetVector.z = (rightOffsetVector.z / cornerPoint.distance(to: leftHandlePosition)) * Float(rightOffset)
+        
+        // apply offset to inset edges
+        let intersectionPoint = SCNVector3(cornerPoint.x + leftOffsetVector.x + rightOffsetVector.x,
+                                           cornerPoint.y,
+                                           cornerPoint.z + leftOffsetVector.z + rightOffsetVector.z)
+        
+        let leftInsetOuterPoint = SCNVector3(leftHandlePosition.x + leftOffsetVector.x,
+                                             cornerPoint.y,
+                                             leftHandlePosition.z + leftOffsetVector.z)
+        let rightInsetOuterPoint = SCNVector3(rightHandlePosition.x + rightOffsetVector.x,
+                                              cornerPoint.y,
+                                              rightHandlePosition.z + rightOffsetVector.z)
+        
+        // update the edges
+        leftInset.update(pivotPoint: intersectionPoint, outerPoint: leftInsetOuterPoint)
+        rightInset.update(pivotPoint: intersectionPoint, outerPoint: rightInsetOuterPoint)
+        
+        leftInset.updateColor(to: ARConstants.leftColor)
+        rightInset.updateColor(to: ARConstants.rightColor)
+        
+        leftInset.isHidden = false
+        rightInset.isHidden = false
     }
 }
